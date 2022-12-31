@@ -1,6 +1,12 @@
 ﻿using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Toolchains;
+using BenchmarkDotNet.Toolchains.DotNetCli;
+using BenchmarkDotNet.Toolchains.MonoWasm;
 
 namespace MyBenchmarks
 {
@@ -41,9 +47,26 @@ namespace MyBenchmarks
 
     public class Program
     {
+        private static Job CreateJob(string name, string runtimePath)
+        {
+            WasmRuntime runtime = new WasmRuntime(msBuildMoniker: "net8.0",
+                wasmDataDir: Path.Combine(runtimePath, "src/mono/wasm"),
+                moniker: RuntimeMoniker.WasmNet80);
+            NetCoreAppSettings netCoreAppSettings = new NetCoreAppSettings(
+                targetFrameworkMoniker: "net8.0", runtimeFrameworkVersion: "net8.0", name: "Wasm: " + name,
+                customDotNetCliPath: Path.Combine(runtimePath, "artifacts/bin/dotnet-latest/dotnet"));
+            IToolchain toolChain = WasmToolchain.From(netCoreAppSettings);
+
+            return Job.ShortRun.WithRuntime(runtime).WithToolchain(toolChain).WithId(name);
+        }
+
         public static void Main(string[] args)
         {
-            var summary = BenchmarkRunner.Run<TryGetHashCode>(null!, args);
+            BenchmarkRunner.Run<TryGetHashCode>(DefaultConfig.Instance
+                .KeepBenchmarkFiles(true)
+                .AddJob(CreateJob("merge-base", @"/tank/externsrc/dotnet/runtime.main").AsBaseline())
+                .AddJob(CreateJob("PR", @"/tank/externsrc/dotnet/runtime"))
+                );
         }
     }
 }

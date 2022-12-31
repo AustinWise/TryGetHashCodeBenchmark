@@ -1,0 +1,5 @@
+<Project>
+    <PropertyGroup>
+        <WasmMainJSPath>/tank/externsrc/dotnet/runtime/src/mono/wasm/test-main.js</WasmMainJSPath>
+    </PropertyGroup>
+</Project>

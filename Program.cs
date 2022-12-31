@@ -11,7 +11,7 @@ namespace MyBenchmarks
         private object mAnObjectInTheTable = null!;
 
 
-        [Params(1000)]
+        [Params(1, 100, 1000, 10000)]
         public int NumberOfObjects;
 
         [GlobalSetup]
@@ -43,7 +43,7 @@ namespace MyBenchmarks
     {
         public static void Main(string[] args)
         {
-            var summary = BenchmarkRunner.Run<TryGetHashCode>();
+            var summary = BenchmarkRunner.Run<TryGetHashCode>(null!, args);
         }
     }
 }

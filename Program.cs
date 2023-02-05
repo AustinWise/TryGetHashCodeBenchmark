@@ -16,8 +16,8 @@ namespace MyBenchmarks
         private readonly ConditionalWeakTable<object, object> mWeakTable = new();
         private object mAnObjectInTheTable = null!;
 
-
-        [Params(1, 100, 1000, 10000)]
+        // While running these benchmarks, the number of objects has not made a difference.
+        [Params(1000)]
         public int NumberOfObjects;
 
         [GlobalSetup]
@@ -57,7 +57,7 @@ namespace MyBenchmarks
                 customDotNetCliPath: Path.Combine(runtimePath, "artifacts/bin/dotnet-latest/dotnet"));
             IToolchain toolChain = WasmToolchain.From(netCoreAppSettings);
 
-            return Job.ShortRun.WithRuntime(runtime).WithToolchain(toolChain).WithId(name);
+            return Job.MediumRun.WithRuntime(runtime).WithToolchain(toolChain).WithId(name);
         }
 
         public static void Main(string[] args)
